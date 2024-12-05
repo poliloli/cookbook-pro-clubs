@@ -8,17 +8,26 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
+import IconButton from "@mui/material/IconButton";
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import MenuIcon from "@mui/icons-material/Menu";
+
 
 const drawerWidth = 240;
 
 function App() {
   const { window } = () => Window;;
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [selectedChapter, setSelectedChapter] = useState('intro');
 
   const handleChapterClick = (chapter) => {
+    setMobileOpen(false);
     setSelectedChapter(chapter);
+  };
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
   };
 
   const drawer = (
@@ -80,35 +89,68 @@ function App() {
         position="fixed"
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
-          ml: { sm: `${drawerWidth}px}` },
+          ml: { sm: `${drawerWidth}px` },
         }}
       >
-        <Toolbar sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', zIndex: 10 }}>
-          <Box sx={{ mb: 2 }}>
+        <Toolbar>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={handleDrawerToggle}
+            sx={{ display: { sm: "none" } }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Box>
             <Typography variant="h6" noWrap component="div">
               Cookbook Pro Clubs ⚽👨‍🍳
             </Typography>
+            <Typography variant="subtitle1" noWrap component="div">
+              Receita Para o Sucesso (Ou Algo Próximo Disso)
+            </Typography>
           </Box>
-          <Typography variant="h6" noWrap component="div">
-            Receita Para o Sucesso (Ou Algo Próximo Disso)
-          </Typography>
         </Toolbar>
       </AppBar>
 
-      {/* Drawer lateral */}
-      <Drawer
-        variant="permanent"
-        sx={{
-          display: { xs: 'none', sm: 'block' },
-          '& .MuiDrawer-paper': {
-            boxSizing: 'border-box',
-            width: drawerWidth,
-          },
-        }}
-        open
+      {/* Drawer Responsivo */}
+      <Box
+        component="nav"
+        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+        aria-label="drawer navigation"
       >
-        {drawer}
-      </Drawer>
+        {/* Drawer Temporário (telas pequenas) */}
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{ keepMounted: true }} // Melhora o desempenho em dispositivos móveis
+          sx={{
+            display: { xs: "block", sm: "none" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+            },
+          }}
+        >
+          {drawer}
+        </Drawer>
+
+        {/* Drawer Permanente (telas maiores) */}
+        <Drawer
+          variant="permanent"
+          sx={{
+            display: { xs: "none", sm: "block" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+            },
+          }}
+          open
+        >
+          {drawer}
+        </Drawer>
+      </Box>
 
       {/* Área de conteúdo principal */}
       <Box
@@ -116,29 +158,46 @@ function App() {
         sx={{
           flexGrow: 1,
           p: 3,
-          width: { sm: `calc(100% - ${drawerWidth}px)` }, // Ajusta a largura do conteúdo
-          marginTop: '64px', // Espaço para o AppBar fixo
-          marginLeft: { sm: `${drawerWidth}px` }, // Espaço para o Drawer não sobrepor
-          overflowY: 'auto', // Para evitar transbordamento de conteúdo
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
         }}
       >
         {selectedChapter === 'intro' && (
-          <Box sx={{ marginTop: 3, marginBottom: 3 }}>
+          <Box sx={{ marginTop: 7, marginBottom: 3 }}>
             <Typography variant="h5" sx={{ marginBottom: 2 }}>Introdução</Typography>
             <Typography sx={{ marginBottom: 2 }}>
               Bem-vindo, jogador sem "skill moves" e com mira de arco e flecha quebrado. Este <b>livro de receitas </b> foi criado especialmente para você, que transforma passes simples em momentos de pura tragédia esportiva. Não se preocupe, cada página aqui é recheada de "dicas culinárias" para fazer de você, pelo menos, um jogador menos desastroso no <b>Pro Clubs</b>.
               Afinal, o que é um time sem um amigo que joga com o carisma de um cone de treino?
             </Typography>
-            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-              <img src="https://images.ctfassets.net/i92rifgawgzm/5FeeBM9B809DLkP4RHPrDU/f823e3050b9884abb8b4a381e20fd8ee/logo-ea-sports-fc.png.adapt.1920w.png" alt="fc" />
-              <img src="https://media.contentapi.ea.com/content/dam/ea/fifa/pro-clubs/common/f22-proclubs-logo.png.adapt.768w.png" alt="proclubs" />
+            <div style={{
+              position: 'fixed', // Fixa a posição da div em relação à janela
+              bottom: 0, // Posiciona a div na parte inferior da página
+              left: 0, // Garante que a div comece do canto esquerdo
+              width: '100%', // Faz a div ocupar toda a largura
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              flexWrap: 'wrap', // Permite que as imagens fiquem em uma nova linha se necessário
+              gap: '10px', // Espaçamento entre as imagens
+              padding: '10px' // Adiciona espaçamento interno (opcional)
+            }}>
+              <img src="https://images.ctfassets.net/i92rifgawgzm/5FeeBM9B809DLkP4RHPrDU/f823e3050b9884abb8b4a381e20fd8ee/logo-ea-sports-fc.png.adapt.1920w.png" alt="fc" style={{
+                maxWidth: '100%', // Faz com que a imagem nunca exceda o tamanho da tela
+                height: 'auto', // Mantém a proporção da imagem
+                width: '200px' // Tamanho fixo para telas maiores
+              }} />
+              <img src="https://media.contentapi.ea.com/content/dam/ea/fifa/pro-clubs/common/f22-proclubs-logo.png.adapt.768w.png" alt="proclubs" style={{
+                maxWidth: '100%',
+                height: 'auto',
+                width: '200px'
+              }} />
             </div>
           </Box>
         )}
 
         {/* Capítulo 1 */}
         {selectedChapter === 'c1' && (
-          <Box sx={{ marginTop: 3, marginBottom: 3 }}>
+          <Box sx={{ marginTop: 7, marginBottom: 3 }}>
             <Typography variant="h5" sx={{ marginBottom: 2 }}>Receita de Passe Simples</Typography>
             <Typography sx={{ marginBottom: 2 }}>
               <h4>Ingredientes:</h4>
@@ -160,7 +219,7 @@ function App() {
 
         {/* Capítulo 2 */}
         {selectedChapter === 'c2' && (
-          <Box sx={{ marginTop: 3, marginBottom: 3 }}>
+          <Box sx={{ marginTop: 7, marginBottom: 3 }}>
             <Typography variant="h5" sx={{ marginBottom: 2 }}>2. Dribles de Luxo para Jogadores de Pé Torto</Typography>
             <Typography sx={{ marginBottom: 2 }}>
               <h4>Ingredientes:</h4>
@@ -182,7 +241,7 @@ function App() {
 
         {/* Capítulo 3 */}
         {selectedChapter === 'c3' && (
-          <Box sx={{ marginTop: 3, marginBottom: 3 }}>
+          <Box sx={{ marginTop: 7, marginBottom: 3 }}>
             <Typography variant="h5" sx={{ marginBottom: 2 }}>3. Gol Certeiro: A Receita Improvável</Typography>
             <Typography sx={{ marginBottom: 2 }}>
               <h4>Ingredientes:</h4>
@@ -204,7 +263,7 @@ function App() {
 
         {/* Capítulo 4 */}
         {selectedChapter === 'c4' && (
-          <Box sx={{ marginTop: 3, marginBottom: 3 }}>
+          <Box sx={{ marginTop: 7, marginBottom: 3 }}>
             <Typography variant="h5" sx={{ marginBottom: 2 }}>4. A Defesa é Uma Arte (Que Você Não Domina)</Typography>
             <Typography sx={{ marginBottom: 2 }}>
               <h4>Ingredientes:</h4>
@@ -226,7 +285,7 @@ function App() {
 
         {/* Capítulo 5 */}
         {selectedChapter === 'c5' && (
-          <Box sx={{ marginTop: 3, marginBottom: 3 }}>
+          <Box sx={{ marginTop: 7, marginBottom: 3 }}>
             <Typography variant="h5" sx={{ marginBottom: 2 }}>5. O Goleiro: Última Linha ou Última Piada?</Typography>
             <Typography sx={{ marginBottom: 2 }}>
               <h4>Ingredientes:</h4>
@@ -247,7 +306,7 @@ function App() {
 
         {/* Capítulo 6 */}
         {selectedChapter === 'c6' && (
-          <Box sx={{ marginTop: 3, marginBottom: 3 }}>
+          <Box sx={{ marginTop: 7, marginBottom: 3 }}>
             <Typography variant="h5" sx={{ marginBottom: 2 }}>6. Estratégia: "A Defesa Não é Meu Problema"</Typography>
             <Typography sx={{ marginBottom: 2 }}>
               <h4>Ingredientes:</h4>
@@ -268,7 +327,7 @@ function App() {
 
         {/* Mensagem Final */}
         {selectedChapter === 'end' && (
-          <Box sx={{ marginTop: 3, marginBottom: 3 }}>
+          <Box sx={{ marginTop: 7, marginBottom: 3 }}>
             <Typography variant="h5" sx={{ marginBottom: 2 }}>Mensagem Final</Typography>
             <Typography sx={{ marginBottom: 2 }}>
               <b>Caro amigo</b>, lembre-se: no Pro Clubs, <b>o mais importante não é a vitória</b> (mentira, é sim), mas as risadas compartilhadas quando você perde a bola pela 15ª vez ou manda um passe para o adversário.
